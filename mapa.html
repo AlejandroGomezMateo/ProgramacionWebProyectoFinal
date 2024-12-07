@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa con Mis Multas</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Estilo del mapa */
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="inicio.html">Inicio</a>
+        <a href="registrar.html">Registrar Multa</a>
+        <a href="mapa.html">Mapa con Mis Multas</a>
+        <a href="/comision.html">Comisión por Mes</a>
+        <a href="administrador.html">Administrador</a>
+        <a href="/acercade.html">Acerca de</a>
+        <a href="index.html">Salir</a>
+    </nav>
+
+    <h1>Mapa con Mis Multas</h1>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.1/dist/leaflet.js"></script>
+    <script>
+        // Inicialización del mapa
+        const map = L.map('map').setView([18.4744, -69.9324], 12); // Coordenadas por defecto
+
+        // Agregar un mapa base de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Obtener las multas del almacenamiento local
+        const multas = JSON.parse(localStorage.getItem("multas")) || [];
+
+        // Iterar sobre las multas y agregar marcadores al mapa
+        multas.forEach(multa => {
+            const coordenadas = multa.coordenadas.split(",").map(coord => parseFloat(coord.trim()));
+
+            if (coordenadas.length === 2 && !isNaN(coordenadas[0]) && !isNaN(coordenadas[1])) {
+                // Crear un marcador en las coordenadas
+                const marcador = L.marker(coordenadas).addTo(map);
+
+                // Crear un popup con la información de la multa
+                marcador.bindPopup(`
+                    <div>
+                        <h3>${multa.nombre}</h3>
+                        <p><strong>Cédula:</strong> ${multa.cedula}</p>
+                        <p><strong>Descripción:</strong> ${multa.descripcion}</p>
+                        <p><strong>Fecha:</strong> ${multa.fecha}</p>
+                    </div>
+                `);
+            }
+        });
+
+        // Ajustar automáticamente el mapa para mostrar todos los marcadores
+        if (multas.length > 0) {
+            const bounds = multas.map(multa => multa.coordenadas.split(",").map(coord => parseFloat(coord.trim())));
+            map.fitBounds(bounds);
+        }
+    </script>
+
+</body>
+</html>
+

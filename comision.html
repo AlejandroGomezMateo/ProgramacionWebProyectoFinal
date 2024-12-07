@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comisión por Mes</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="inicio.html">Inicio</a>
+        <a href="registrar.html">Registrar Multa</a>
+        <a href="mapa.html">Mapa con Mis Multas</a>
+        <a href="comision.html">Comisión por Mes</a>
+        <a href="administrador.html">Administrador</a>
+        <a href="/acercade.html">Acerca de</a>
+        <a href="index.html">Salir</a>
+    </nav>
+
+    <div id="comisionContainer">
+        <section class="info-agente">
+            <h1>Comisión por Mes</h1>
+            <p><strong>Cédula del agente:</strong> <span id="cedulaAgente">12345</span></p>
+            <p><strong>Comisión por Mes:</strong> <span id="comisionMes">500</span> USD</p>
+        </section>
+    
+        <section class="ultimas-multas">
+    <h2>Últimas Multas:</h2>
+    <div class="multas-container" id="ultimasMultas">
+        <!-- Estas serán las multas con la cédula, nombre y costo -->
+        <!-- Los datos se agregarán mediante JavaScript -->
+    </div>
+        </section>
+    <script src="js/comision.js"></script>
+</body>
+</html>
+

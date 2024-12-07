@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Multa</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="inicio.html">Inicio</a>
+        <a href="registrar.html">Registrar Multa</a>
+        <a href="/mapa.html">Mapa con Mis Multas</a>
+        <a href="/comision.html">Comisión por Mes</a>
+        <a href="administrador.html">Administrador</a>
+        <a href="/acercade.html">Acerca de</a>
+        <a href="index.html">Salir</a>
+    </nav>
+
+    <div id="app">
+        <h1>Registrar Multa</h1>
+        <form id="formRegistrarMulta">
+            <label for="cedula">Cédula:</label>
+            <input type="text" id="cedula" name="cedula" required>
+
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" required>
+
+            <label for="descripcion">Descripción:</label>
+            <textarea id="descripcion" name="descripcion" required></textarea>
+
+            <label for="coordenadas">Coordenadas:</label>
+            <input type="text" id="coordenadas" name="coordenadas" required>
+
+            <label for="foto">Foto:</label>
+            <input type="file" id="foto" name="foto" accept="image/*" required>
+
+            <label for="fecha">Fecha:</label>
+            <input type="date" id="fecha" name="fecha" required>
+
+            <label for="costo">Costo:</label>
+            <input type="number" id="costo" name="costo" required>
+
+            <button type="submit">Registrar Multa</button>
+        </form>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        document.getElementById("formRegistrarMulta").addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const cedula = document.getElementById("cedula").value;
+    const nombre = document.getElementById("nombre").value;
+    const descripcion = document.getElementById("descripcion").value;
+    const coordenadas = document.getElementById("coordenadas").value;
+    const foto = document.getElementById("foto").files[0];
+    const fecha = document.getElementById("fecha").value;
+    const costo = parseFloat(document.getElementById("costo").value); // Asegurarse de convertir a número
+
+    if (!cedula || !nombre || !descripcion || !coordenadas || !fecha || isNaN(costo)) {
+        alert("Por favor, completa todos los campos correctamente.");
+        return;
+    }
+
+    // Leer la imagen como Base64
+    const reader = new FileReader();
+    reader.onload = function (event) {
+        const fotoBase64 = event.target.result;
+
+        const multa = { cedula, nombre, descripcion, coordenadas, foto: fotoBase64, fecha, costo }; // Incluir costo
+
+        const multas = JSON.parse(localStorage.getItem("multas")) || [];
+        const indexEditar = localStorage.getItem("multaEditarIndex");
+
+        if (indexEditar !== null) {
+            // Modo edición
+            multas[parseInt(indexEditar)] = multa;
+            localStorage.removeItem("multaEditarIndex"); // Limpiar el índice de edición
+        } else {
+            // Modo registro nuevo
+            multas.push(multa);
+        }
+
+        localStorage.setItem("multas", JSON.stringify(multas));
+        alert("Multa registrada exitosamente.");
+        window.location.href = "inicio.html"; // Regresar al inicio después de registrar
+    };
+
+    if (foto) {
+        reader.readAsDataURL(foto); // Convertir la imagen a Base64
+    } else {
+        reader.onload(); // Si no se subió una nueva foto, guardar directamente
+    }
+});
+
+    
+        // Cargar datos de la multa en modo edición
+        function cargarMultaParaEditar() {
+            const indexEditar = localStorage.getItem("multaEditarIndex");
+            if (indexEditar !== null) {
+                const multas = JSON.parse(localStorage.getItem("multas")) || [];
+                const multa = multas[parseInt(indexEditar)];
+    
+                document.getElementById("cedula").value = multa.cedula;
+                document.getElementById("nombre").value = multa.nombre;
+                document.getElementById("descripcion").value = multa.descripcion;
+                document.getElementById("coordenadas").value = multa.coordenadas;
+                document.getElementById("fecha").value = multa.fecha;
+                document.getElementById("costo").value = multa.costo;
+            }
+        }
+    
+        cargarMultaParaEditar();
+    </script>
+    
+</body>
+</html>

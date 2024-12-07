@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionar Agentes</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="inicio.html">Inicio</a>
+        <a href="registrar.html">Registrar Multa</a>
+        <a href="mapa.html">Mapa con Mis Multas</a>
+        <a href="comision.html">Comisión por Mes</a>
+        <a href="/acercade.html">Acerca de</a>
+        <a href="index.html">Salir</a>
+        <a href="administrador.html">Administrador</a>
+    </nav>
+    <h1 id="h1-3">Gestionar Agentes</h1>
+    <div id="app">
+        <form id="agenteForm">
+            <label for="cedula">Cédula:</label>
+            <input type="text" id="cedula" name="cedula" required>
+
+            <label for="clave">Clave:</label>
+            <input type="password" id="clave" name="clave" required>
+
+            <button type="submit">Agregar Agente</button>
+        </form>
+
+        <h2>Agentes Registrados</h2>
+        <ul id="agentesList"></ul>
+    </div>
+
+    <script>
+        // Cargar agentes del localStorage y mostrarlos
+        function cargarAgentes() {
+            const agentes = JSON.parse(localStorage.getItem("agentes")) || [];
+            const agentesList = document.getElementById("agentesList");
+            agentesList.innerHTML = "";
+
+            agentes.forEach((agente, index) => {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    ${agente.cedula} - ${agente.estado === 'activo' ? 'Activo' : 'Desactivado'}
+                    <button class="btn-editar" onclick="editarAgente(${index})">Editar</button>
+                    <button class="btn-eliminar" onclick="eliminarAgente(${index})">Eliminar</button>
+                    <button class="btn-toggle-estado" onclick="toggleEstadoAgente(${index})">
+                        ${agente.estado === 'activo' ? 'Desactivar' : 'Activar'}
+                    </button>
+                `;
+                agentesList.appendChild(li);
+            });
+        }
+
+        // Agregar un nuevo agente
+        document.getElementById("agenteForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const cedula = document.getElementById("cedula").value.trim();
+            const clave = document.getElementById("clave").value.trim();
+
+            if (!cedula || !clave) {
+                alert("Por favor completa todos los campos.");
+                return;
+            }
+
+            const agentes = JSON.parse(localStorage.getItem("agentes")) || [];
+
+            // Verificar que la cédula no esté repetida
+            if (agentes.some(agente => agente.cedula === cedula)) {
+                alert("Ya existe un agente con esta cédula.");
+                return;
+            }
+
+            agentes.push({ cedula, clave, estado: 'activo' });
+            localStorage.setItem("agentes", JSON.stringify(agentes));
+            cargarAgentes();
+            e.target.reset(); // Limpiar el formulario
+        });
+
+        // Editar un agente
+        function editarAgente(index) {
+            const agentes = JSON.parse(localStorage.getItem("agentes")) || [];
+            const agente = agentes[index];
+
+            document.getElementById("cedula").value = agente.cedula;
+            document.getElementById("clave").value = agente.clave;
+
+            agentes.splice(index, 1); // Remover el agente para actualizarlo
+            localStorage.setItem("agentes", JSON.stringify(agentes));
+            cargarAgentes();
+        }
+
+        // Eliminar un agente
+        function eliminarAgente(index) {
+            const agentes = JSON.parse(localStorage.getItem("agentes")) || [];
+            agentes.splice(index, 1); // Eliminar el agente
+            localStorage.setItem("agentes", JSON.stringify(agentes));
+            cargarAgentes();
+        }
+
+        // Cambiar el estado de un agente (activar/desactivar)
+        function toggleEstadoAgente(index) {
+            const agentes = JSON.parse(localStorage.getItem("agentes")) || [];
+            const agente = agentes[index];
+            agente.estado = agente.estado === 'activo' ? 'desactivado' : 'activo';
+            localStorage.setItem("agentes", JSON.stringify(agentes));
+            cargarAgentes();
+        }
+
+        // Inicializar la lista de agentes
+        cargarAgentes();
+    </script>
+</body>
+</html>
+

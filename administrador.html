@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrador</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="registrar.html">Registrar Multa</a>
+        <a href="mapa.html">Mapa con Mis Multas</a>
+        <a href="/comision.html">Comisión por Mes</a>
+        <a href="administrador.html">Administrador</a>
+        <a href="/acercade.html">Acerca de</a>
+        <a href="index.html">Salir</a>
+    </nav>
+
+    <div class="login-container2">
+        <h2 id="h1-1">Ingreso Administrador</h2>
+        <form id="loginForm">
+            <label for="usuario">Usuario:</label>
+            <input type="text" id="usuario" name="usuario" required>
+
+            <label for="clave">Contraseña:</label>
+            <input type="password" id="clave" name="clave" required>
+
+            <button type="submit">Ingresar</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const usuario = document.getElementById("usuario").value;
+            const clave = document.getElementById("clave").value;
+
+            if (usuario === "adamix" && clave === "estoesfacil") {
+                // Si las credenciales son correctas, redirigir al panel de administración
+                localStorage.setItem("isAdminLoggedIn", true);
+                window.location.href = "gestion-agentes.html";
+            } else {
+                alert("Credenciales incorrectas.");
+            }
+        });
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Módulo de Agente</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="inicio.html">Inicio</a>
+        <a href="registrar.html">Registrar Multa</a>
+        <a href="mapa.html">Mapa con Mis Multas</a>
+        <a href="/comision.html">Comisión por Mes</a>
+        <a href="administrador.html">Administrador</a>
+        <a href="/acercade.html">Acerca de</a>
+        <a href="index.html">Salir</a>
+    </nav>
+
+    <h3 id="h-2">Multas Registradas</h3>
+
+    <!-- Barra de búsqueda -->
+    <div class="search-container">
+        <input type="text" id="searchBar" placeholder="Buscar por nombre o cédula..." oninput="filtrarMultas()">
+    </div>
+
+    <div id="app">
+        <ul id="listado-multas" class="tarjetas"></ul>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="/js/verificar.js"></script>
+    <script>
+        
+        // Función para filtrar las multas por nombre o cédula
+        function filtrarMultas() {
+            const searchValue = document.getElementById("searchBar").value.toLowerCase(); // Valor del campo de búsqueda
+            const multas = JSON.parse(localStorage.getItem("multas")) || [];
+            const listadoMultas = document.getElementById("listado-multas");
+            listadoMultas.innerHTML = ""; // Limpiar los resultados antes de mostrar los nuevos
+
+            // Filtrar las multas por nombre o cédula
+            const multasFiltradas = multas.filter(multa => {
+                const nombre = multa.nombre.toLowerCase();
+                const cedula = multa.cedula.toLowerCase();
+                return nombre.includes(searchValue) || cedula.includes(searchValue);
+            });
+
+            // Mostrar las multas filtradas
+            if (multasFiltradas.length === 0) {
+                listadoMultas.innerHTML = "<li>No se encontraron multas.</li>";
+            } else {
+                multasFiltradas.forEach((multa, index) => {
+                    const li = document.createElement("li");
+                    li.className = "tarjeta";
+                    li.innerHTML = `
+                        <div class="menu-estatus">
+                            <select class="estado-multa" data-index="${index}">
+                                <option value="activa" ${multa.estado === "activa" ? "selected" : ""}>Estado: Activa</option>
+                                <option value="perdonada" ${multa.estado === "perdonada" ? "selected" : ""}>Estado: Perdonada</option>
+                                <option value="pagada" ${multa.estado === "pagada" ? "selected" : ""}>Estado: Pagada</option>
+                            </select>
+                        </div>
+                        <img src="${multa.foto}" alt="Foto de la multa" class="tarjeta-img">
+                        <div class="tarjeta-contenido">
+                            <h3>${multa.nombre}</h3>
+                            <p><strong>Cédula:</strong> ${multa.cedula}</p>
+                            <p><strong>Descripción:</strong> ${multa.descripcion}</p>
+                            <p><strong>Costo en dolares:</strong> ${multa.costo}</p>
+                            <p><strong>Fecha:</strong> ${multa.fecha}</p>
+                            <p><strong>Coordenadas:</strong> ${multa.coordenadas}</p>
+                            <button class="btn-editar" data-index="${index}">Editar</button>
+                            <button class="btn-eliminar" data-index="${index}">Eliminar</button>
+                        </div>
+                    `;
+                    listadoMultas.appendChild(li);
+                });
+            }
+
+            // Añadir eventos a los botones
+            document.querySelectorAll(".btn-eliminar").forEach((btn) => {
+                btn.addEventListener("click", (e) => {
+                    const index = e.target.getAttribute("data-index");
+                    eliminarMulta(index);
+                });
+            });
+
+            document.querySelectorAll(".btn-editar").forEach((btn) => {
+                btn.addEventListener("click", (e) => {
+                    const index = e.target.getAttribute("data-index");
+                    editarMulta(index);
+                });
+            });
+
+            // Añadir evento al select para actualizar el estado
+            document.querySelectorAll(".estado-multa").forEach((select) => {
+                select.addEventListener("change", (e) => {
+                    const index = e.target.getAttribute("data-index");
+                    const nuevoEstado = e.target.value;
+                    actualizarEstado(index, nuevoEstado);
+                });
+            });
+        }
+
+        // Función para actualizar el estado de la multa
+        function actualizarEstado(index, nuevoEstado) {
+            const multas = JSON.parse(localStorage.getItem("multas")) || [];
+            multas[index].estado = nuevoEstado;
+            localStorage.setItem("multas", JSON.stringify(multas));
+            filtrarMultas(); // Actualizar la lista de multas
+        }
+
+        // Función para eliminar una multa
+        function eliminarMulta(index) {
+            const multas = JSON.parse(localStorage.getItem("multas")) || [];
+            multas.splice(index, 1); // Eliminar la multa seleccionada
+            localStorage.setItem("multas", JSON.stringify(multas)); // Guardar los cambios
+            filtrarMultas(); // Actualizar la lista
+            alert("Multa eliminada con éxito.");
+        }
+
+        // Función para editar una multa
+        function editarMulta(index) {
+            localStorage.setItem("multaEditarIndex", index); // Guardar el índice en localStorage
+            window.location.href = "registrar.html"; // Redirigir a la página de registrar
+        }
+
+        function verificarUsuarioDesactivado() {
+        // Obtener los agentes desde localStorage
+        const agentes = JSON.parse(localStorage.getItem("agentes")) || [];
+        
+        // La cédula del usuario actual (esto se puede obtener de una sesión o algún otro método)
+        const cedula = "12345"; 
+
+        // Buscar al agente con la cédula proporcionada
+        const agente = agentes.find(agente => agente.cedula === cedula);
+
+        // Si el agente está desactivado, mostrar alerta y redirigir
+        if (agente && agente.estado === "desactivado") {
+            alert("Su usuario está desactivado.");
+            window.location.href = "index.html"; // Redirigir al login
+        }
+    }
+
+    // Llamar a la función para verificar el estado del usuario
+    verificarUsuarioDesactivado();
+
+        // Mostrar las multas al cargar la página
+        window.onload = filtrarMultas;
+
+        
+    </script>
+</body>
+</html>
+
